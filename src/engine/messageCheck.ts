@@ -1,4 +1,5 @@
 import { RiskEngine, ALERT_THRESHOLD, CAUTION_THRESHOLD } from './engine';
+import { scamModel } from '../model';
 import type { RiskLevel, TacticId } from './types';
 import { maskSensitive, type MaskKind } from '../privacy/mask';
 
@@ -40,7 +41,7 @@ export function findLinks(text: string): LinkFinding[] {
 export function checkMessage(raw: string): MessageCheck {
   const m = maskSensitive(raw);
   const links = findLinks(m.text);
-  const e = new RiskEngine();
+  const e = new RiskEngine({ model: scamModel });
   const snap = e.push(m.text);
   let risk = snap.risk;
   const flagged = links.filter((l) => l.reasons.length > 0);

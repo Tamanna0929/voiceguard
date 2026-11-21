@@ -4,6 +4,7 @@ import * as Speech from 'expo-speech';
 import * as Haptics from 'expo-haptics';
 import { useKeepAwake } from 'expo-keep-awake';
 import { RiskEngine, ALERT_THRESHOLD, CAUTION_THRESHOLD } from '../engine/engine';
+import { scamModel } from '../model';
 import type { Snapshot } from '../engine/types';
 import type { CallScript } from '../data/scripts';
 import { addHistory, type Settings } from '../services/storage';
@@ -25,7 +26,7 @@ const speak = (text: string, language: string) =>
 export function LiveScreen({ settings, script, onBack, onRecovery }: { settings: Settings; script?: CallScript; onBack: () => void; onRecovery: () => void }) {
   useKeepAwake();
   const lang = settings.lang;
-  const engine = useRef(new RiskEngine()).current;
+  const engine = useRef(new RiskEngine({ model: scamModel })).current;
   const startedAt = useRef(Date.now());
   const who = useRef(new Map<number, 'caller' | 'you'>());
   const lastLevel = useRef('safe');
