@@ -37,6 +37,8 @@ export const CAUTION_THRESHOLD = 35;
 const DECAY = 0.9;
 const MAX_STRENGTH = 3;
 const MAX_P = 0.92;
+/** After a dismissal, a NEW tactic from this set re-raises the alert at the normal threshold. */
+const SERIOUS: ReadonlySet<TacticId> = new Set<TacticId>(['OTP', 'CREDENTIALS', 'PAYMENT', 'REMOTE_ACCESS', 'ISOLATION', 'THREAT']);
 
 /** Pure function: find tactic hits in one piece of text (also used for live interim preview). */
 export function analyze(text: string): Hit[] {
@@ -78,6 +80,7 @@ export class RiskEngine {
   private nextId = 1;
   private latched = false;
   private dismissed = false;
+  private dismissedTactics = new Set<TacticId>();
   private utterances: Utterance[] = [];
   private alertAt: number;
   private cautionAt: number;
@@ -99,6 +102,7 @@ export class RiskEngine {
     this.nextId = 1;
     this.latched = false;
     this.dismissed = false;
+    this.dismissedTactics.clear();
     this.utterances = [];
     this.modelEvidence = 0;
     this.modelP = 0;
@@ -146,7 +150,15 @@ export class RiskEngine {
   /** User dismissed the alert: only escalate again if risk climbs even higher. */
   dismissAlert() {
     this.dismissed = true;
+    this.dismissedTactics = this.presentTactics();
     this.latched = false;
+  }
+
+  /** Tactics that are currently strong enough to count as present. */
+  private presentTactics(): Set<TacticId> {
+    const out = new Set<TacticId>();
+    for (const [id, st] of this.strength) if (st >= 0.5) out.add(id);
+    return out;
   }
 
   snapshot(utterance?: Utterance, newAlert = this.pendingNewAlert): Snapshot {
@@ -194,13 +206,21 @@ export class RiskEngine {
     else this.shown = Math.max(target, this.shown - 5);
     this.peak = Math.max(this.peak, this.shown);
 
-    const threshold = this.dismissed ? Math.max(this.alertAt, 90) : this.alertAt;
+    let threshold = this.alertAt;
+    if (this.dismissed) {
+      // dismissed earlier: stay quiet unless a NEW serious tactic shows up (or risk is extreme)
+      const fresh = [...this.presentTactics()].some((t) => SERIOUS.has(t) && !this.dismissedTactics.has(t));
+      if (!fresh) threshold = Math.max(this.alertAt, 90);
+    }
     if (!this.latched && this.shown >= threshold) {
       this.latched = true;
       this.pendingNewAlert = true;
     }
     if (this.shown < this.cautionAt && this.latched) this.latched = false;
-    if (this.shown < this.cautionAt) this.dismissed = false;
+    if (this.shown < this.cautionAt) {
+      this.dismissed = false;
+      this.dismissedTactics.clear();
+    }
   }
 
   private evidence(): { target: number; active: TacticId[] } {
