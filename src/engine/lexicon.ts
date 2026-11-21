@@ -31,6 +31,8 @@ const requests = (obj: string, extraVerbs = '') => {
   const v = extraVerbs ? `${VERBS}|${extraVerbs}` : VERBS;
   return [`${LB}(?:${v})${GAP}${o}`, `${o}${GAP}(?:${v})`];
 };
+/** Short chat-style demands with no verb: "I want ur otp", "otp pls", "otp chahiye". */
+const V_WANT = '(?:want|need|require|pls|plz|please)(?![a-z])|chahiye|chahie|chaiye|chahta|chahti|चाहिए';
 /** Typing secrets into a page or app on a caller's say-so is just as bad as reading them out. */
 const V_ENTER = '(?:enter|type|key in|put in|punch in|log ?in|sign in)(?![a-z])';
 
@@ -64,13 +66,13 @@ export const TACTICS: TacticDef[] = [
     id: 'OTP',
     base: 0.55,
     adviceGuard: true,
-    patterns: requests(OBJ_OTP).map((r) => p(r)),
+    patterns: requests(OBJ_OTP, V_WANT).map((r) => p(r)),
   },
   {
     id: 'CREDENTIALS',
     base: 0.6,
     adviceGuard: true,
-    patterns: requests(OBJ_CRED, V_ENTER).map((r) => p(r)),
+    patterns: requests(OBJ_CRED, `${V_ENTER}|${V_WANT}`).map((r) => p(r)),
   },
   {
     id: 'PERSONAL_ID',

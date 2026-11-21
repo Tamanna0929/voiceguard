@@ -2,9 +2,12 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { TacticId } from '../engine/types';
 
 export type Lang = 'en' | 'hi' | 'pa';
+export type Plan = 'free' | 'family' | 'bank';
 
 export interface Settings {
   lang: Lang;
+  /** Which plan is switched on (demo only: no real payment). Safety features are always free. */
+  plan: Plan;
   /** Send each finished sentence (text only, never audio) to your own AI proxy for a second opinion. */
   cloudAI: boolean;
   aiEndpoint: string;
@@ -25,6 +28,7 @@ export interface Settings {
 
 export const DEFAULT_SETTINGS: Settings = {
   lang: 'en',
+  plan: 'free',
   cloudAI: false,
   aiEndpoint: '',
   familyName: '',

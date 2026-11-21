@@ -11,6 +11,8 @@ import { RecoveryScreen } from './src/screens/RecoveryScreen';
 import { IncidentsScreen } from './src/screens/IncidentsScreen';
 import { PrivacyScreen } from './src/screens/PrivacyScreen';
 import { CheckScreen } from './src/screens/CheckScreen';
+import { BusinessScreen } from './src/screens/BusinessScreen';
+import { PlansScreen } from './src/screens/PlansScreen';
 import { C } from './src/ui/theme';
 
 type Route =
@@ -22,7 +24,9 @@ type Route =
   | { name: 'recovery' }
   | { name: 'incidents'; openId?: string }
   | { name: 'privacy' }
-  | { name: 'check' };
+  | { name: 'check' }
+  | { name: 'business' }
+  | { name: 'plans' };
 
 export default function App() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
@@ -71,6 +75,8 @@ export default function App() {
       {route.name === 'recovery' && <RecoveryScreen settings={settings} onBack={home} onOpenIncident={(id) => setRoute({ name: 'incidents', openId: id })} />}
       {route.name === 'incidents' && <IncidentsScreen settings={settings} openId={route.openId} onBack={home} onNew={() => setRoute({ name: 'recovery' })} />}
       {route.name === 'check' && <CheckScreen settings={settings} onBack={home} onRecovery={() => setRoute({ name: 'recovery' })} />}
+      {route.name === 'plans' && <PlansScreen settings={settings} onChange={update} onBack={home} />}
+      {route.name === 'business' && <BusinessScreen settings={settings} onBack={home} />}
       {route.name === 'privacy' && <PrivacyScreen settings={settings} onChange={update} onBack={home} onWiped={() => setSettings(DEFAULT_SETTINGS)} />}
     </View>
   );

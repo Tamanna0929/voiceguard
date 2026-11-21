@@ -12,7 +12,7 @@ const LANGS: Array<{ id: Lang; label: string }> = [
   { id: 'pa', label: 'ਪੰਜਾਬੀ' },
 ];
 
-export function HomeScreen({ settings, onLang, go }: { settings: Settings; onLang: (l: Lang) => void; go: (s: 'live' | 'awareness' | 'settings' | 'demo' | 'recovery' | 'incidents' | 'privacy' | 'check') => void }) {
+export function HomeScreen({ settings, onLang, go }: { settings: Settings; onLang: (l: Lang) => void; go: (s: 'live' | 'awareness' | 'settings' | 'demo' | 'recovery' | 'incidents' | 'privacy' | 'check' | 'business' | 'plans') => void }) {
   const lang = settings.lang;
   const [hist, setHist] = useState<SessionRecord[]>([]);
   const [incCount, setIncCount] = useState(0);
@@ -72,6 +72,16 @@ export function HomeScreen({ settings, onLang, go }: { settings: Settings; onLan
       <Pressable style={s.card} onPress={() => go('awareness')} accessibilityRole="button">
         <Text style={s.cardT}>📚  {tr(lang, 'awareness')}</Text>
         <Text style={s.cardS}>{tr(lang, 'awarenessSub')}</Text>
+      </Pressable>
+
+      <Pressable style={s.card} onPress={() => go('plans')} accessibilityRole="button">
+        <Text style={s.cardT}>⭐  {tr(lang, 'plansTitle')}  ·  {settings.plan === 'free' ? 'Free' : settings.plan === 'family' ? 'Family Shield' : 'Bank partner'}</Text>
+        <Text style={s.cardS}>{tr(lang, 'plansSub')}</Text>
+      </Pressable>
+
+      <Pressable style={s.card} onPress={() => go('business')} accessibilityRole="button">
+        <Text style={s.cardT}>💼  {tr(lang, 'bizTitle')}</Text>
+        <Text style={s.cardS}>{tr(lang, 'bizSub')}</Text>
       </Pressable>
 
       <View style={s.helpRow}>

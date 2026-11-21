@@ -45,9 +45,10 @@ export function SettingsScreen({ settings, onChange, onBack }: { settings: Setti
         <Text style={s.label}>{tr(lang, 'cloudTitle')}</Text>
         <Text style={s.help}>{tr(lang, 'cloudHelp')}</Text>
         <View style={s.switchRow}>
-          <Switch value={settings.cloudAI} onValueChange={(v) => set('cloudAI', v)} />
+          <Switch value={settings.cloudAI && settings.plan !== 'free'} disabled={settings.plan === 'free'} onValueChange={(v) => set('cloudAI', v)} />
+          {settings.plan === 'free' && <Text style={s.help}>🔒 {tr(lang, 'planLocked')}</Text>}
         </View>
-        {settings.cloudAI && (
+        {settings.cloudAI && settings.plan !== 'free' && (
           <TextInput
             style={s.input}
             placeholder={tr(lang, 'endpoint') + '  https://…'}

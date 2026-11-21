@@ -77,6 +77,8 @@ export class RiskEngine {
   private peak = 0;
   private nextId = 1;
   private latched = false;
+  /** One-sentence jump: a direct demand for an OTP, password or remote access is dangerous even on its own. */
+  private floorNow = 0;
   private dismissed = false;
   private utterances: Utterance[] = [];
   private alertAt: number;
@@ -127,8 +129,28 @@ export class RiskEngine {
       this.modelP = this.model.predict(win);
       this.modelEvidence = this.model.evidence(this.modelP);
     }
+    this.floorNow = this.demandFloor(utt);
     this.advance(gain, words >= 3 || gain.size > 0);
     return this.snapshot(utt);
+  }
+
+  /**
+   * A single sentence that demands an OTP, password/PIN or remote-access app is a strong warning by itself.
+   * Safety advice ("never share your OTP") never produces these hits, so bank warnings do not trigger it.
+   * With another scam tactic in the same sentence, or the trained model agreeing, it goes straight to red (75).
+   * On its own it only reaches a high caution (58), because honest delivery apps also ask for an OTP.
+   */
+  private demandFloor(utt: Utterance): number {
+    const tactics = new Set(utt.hits.map((h) => h.tactic));
+    const demand = tactics.has('OTP') || tactics.has('CREDENTIALS') || tactics.has('REMOTE_ACCESS');
+    const isolation = tactics.has('ISOLATION');
+    if (!demand && !isolation) return 0;
+    const core = new Set<TacticId>(['OTP', 'CREDENTIALS', 'REMOTE_ACCESS', 'ISOLATION', 'PERSONAL_ID']);
+    const others = [...tactics].filter((x) => !core.has(x)).length;
+    const kinds = [...tactics].filter((x) => core.has(x) && x !== 'PERSONAL_ID').length;
+    const agrees = this.modelP >= 0.6;
+    if (kinds >= 2 || others >= 2 || (agrees && others >= 1)) return 75;
+    return demand ? 72 : 0;
   }
 
   /** Late-arriving AI tags for an utterance that was already pushed. */
@@ -192,6 +214,8 @@ export class RiskEngine {
     // rise fast, fall slowly
     if (target > this.shown) this.shown += (target - this.shown) * 0.85;
     else this.shown = Math.max(target, this.shown - 5);
+    if (this.floorNow > this.shown) this.shown = this.floorNow;
+    this.floorNow = 0;
     this.peak = Math.max(this.peak, this.shown);
 
     const threshold = this.dismissed ? Math.max(this.alertAt, 90) : this.alertAt;

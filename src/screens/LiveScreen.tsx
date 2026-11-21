@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, StatusBar, StyleSheet, Switch, Text, View } from 'react-native';
+import { Platform, Pressable, StatusBar, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 import * as Speech from 'expo-speech';
 import * as Haptics from 'expo-haptics';
 import { useKeepAwake } from 'expo-keep-awake';
 import { RiskEngine, ALERT_THRESHOLD, CAUTION_THRESHOLD } from '../engine/engine';
+import { scamModel } from '../model';
 import type { Snapshot } from '../engine/types';
 import type { CallScript } from '../data/scripts';
 import { addHistory, type Settings } from '../services/storage';
@@ -25,9 +26,10 @@ const speak = (text: string, language: string) =>
 export function LiveScreen({ settings, script, onBack, onRecovery }: { settings: Settings; script?: CallScript; onBack: () => void; onRecovery: () => void }) {
   useKeepAwake();
   const lang = settings.lang;
-  const engine = useRef(new RiskEngine()).current;
+  const engine = useRef(new RiskEngine({ model: scamModel })).current;
   const startedAt = useRef(Date.now());
   const who = useRef(new Map<number, 'caller' | 'you'>());
+  const [typed, setTyped] = useState('');
   const lastLevel = useRef('safe');
   const maskedCounts = useRef<Partial<Record<MaskKind, number>>>({});
   const proxyCount = useRef(0);
@@ -81,7 +83,7 @@ export function LiveScreen({ settings, script, onBack, onRecovery }: { settings:
       const utt = s.utterance!;
       if (speaker) who.current.set(utt.id, speaker);
       refresh(s);
-      if (settings.cloudAI && settings.aiEndpoint && !settings.strictOffline) {
+      if (settings.cloudAI && settings.plan !== 'free' && settings.aiEndpoint && !settings.strictOffline) {
         const ctx = engine
           .getUtterances()
           .slice(-7, -1)
@@ -92,7 +94,7 @@ export function LiveScreen({ settings, script, onBack, onRecovery }: { settings:
         });
       }
     },
-    [engine, refresh, settings.cloudAI, settings.aiEndpoint, settings.strictOffline, settings.maskSensitive, lang],
+    [engine, refresh, settings.cloudAI, settings.plan, settings.aiEndpoint, settings.strictOffline, settings.maskSensitive, lang],
   );
   const processRef = useRef(process);
   processRef.current = process;
@@ -222,6 +224,7 @@ export function LiveScreen({ settings, script, onBack, onRecovery }: { settings:
         <Transcript lines={lines} interim={interim} lang={lang} empty={tr(lang, 'tapStart')} youLabel={tr(lang, 'you')} callerLabel={tr(lang, 'caller')} />
       </View>
 
+      {!script && mic.listening ? <Text style={s.status}>🎙 {mic.status}</Text> : null}
       {leak ? <Text style={s.leak}>⚠️ {tr(lang, 'spokenLeak')}</Text> : null}
       {error ? <Text style={s.error}>{error}</Text> : null}
       {familyNote ? <Text style={s.note}>{familyNote}</Text> : null}
@@ -249,6 +252,32 @@ export function LiveScreen({ settings, script, onBack, onRecovery }: { settings:
         ) : (
           <>
             {!mic.listening && <Text style={s.tip}>{tr(lang, 'speakerTip')}</Text>}
+            <View style={s.typeRow}>
+              <TextInput
+                style={s.typeIn}
+                value={typed}
+                onChangeText={setTyped}
+                placeholder={lang === 'hi' ? 'या यहाँ टाइप करें कि कॉलर ने क्या कहा' : lang === 'pa' ? 'ਜਾਂ ਇੱਥੇ ਟਾਈਪ ਕਰੋ ਕਿ ਕਾਲਰ ਨੇ ਕੀ ਕਿਹਾ' : 'Or type what the caller said'}
+                placeholderTextColor={C.dim}
+                returnKeyType="send"
+                onSubmitEditing={() => {
+                  const v = typed.trim();
+                  if (v) processRef.current(v);
+                  setTyped('');
+                }}
+              />
+              <Pressable
+                style={s.typeBtn}
+                accessibilityRole="button"
+                onPress={() => {
+                  const v = typed.trim();
+                  if (v) processRef.current(v);
+                  setTyped('');
+                }}
+              >
+                <Text style={s.btnTxt}>➤</Text>
+              </Pressable>
+            </View>
             <Pressable
               style={[s.btn, mic.listening && { backgroundColor: C.card, borderWidth: 1, borderColor: C.line }]}
               onPress={() => (mic.listening ? mic.stop() : mic.start())}
@@ -298,6 +327,10 @@ const s = StyleSheet.create({
   footer: { paddingVertical: 12 },
   btn: { backgroundColor: C.blue, borderRadius: 14, paddingVertical: 15, alignItems: 'center', marginTop: 8 },
   btnTxt: { color: '#fff', fontWeight: '800', fontSize: 17 },
+  typeRow: { flexDirection: 'row', gap: 8, marginTop: 8 },
+  typeIn: { flex: 1, backgroundColor: C.card, color: C.text, borderRadius: 12, borderWidth: 1, borderColor: C.line, paddingHorizontal: 12, paddingVertical: 10, fontSize: 15 },
+  typeBtn: { backgroundColor: C.blue, borderRadius: 12, paddingHorizontal: 18, justifyContent: 'center' },
+  status: { color: C.dim, fontSize: 12, marginTop: 6, fontWeight: '700' },
   tip: { color: C.dim, fontSize: 12, textAlign: 'center', marginTop: 8, lineHeight: 17 },
   switchRow: { flexDirection: 'row', alignItems: 'center' },
   switchTxt: { color: C.text, marginLeft: 10 },

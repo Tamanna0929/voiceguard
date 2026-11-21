@@ -49,7 +49,7 @@ export function PrivacyScreen({ settings, onChange, onBack, onWiped }: { setting
     </View>
   );
 
-  const proxyOn = settings.cloudAI && !!settings.aiEndpoint;
+  const proxyOn = settings.cloudAI && settings.plan !== 'free' && !!settings.aiEndpoint;
   return (
     <View style={s.root}>
       <BackBar label={tr(lang, 'back')} onBack={onBack} />
@@ -80,8 +80,8 @@ export function PrivacyScreen({ settings, onChange, onBack, onWiped }: { setting
           <Text style={s.swT}>{tr(lang, 'allowCloudSpeech')}</Text>
         </View>
         <View style={s.sw}>
-          <Switch value={settings.cloudAI && !settings.strictOffline} disabled={settings.strictOffline} onValueChange={(v) => set('cloudAI', v)} />
-          <Text style={s.swT}>{tr(lang, 'cloudTitle')}</Text>
+          <Switch value={settings.cloudAI && !settings.strictOffline && settings.plan !== 'free'} disabled={settings.strictOffline || settings.plan === 'free'} onValueChange={(v) => set('cloudAI', v)} />
+          <Text style={s.swT}>{tr(lang, 'cloudTitle')}{settings.plan === 'free' ? '  🔒' : ''}</Text>
         </View>
         <View style={s.sw}>
           <Switch value={settings.saveHistory} onValueChange={(v) => set('saveHistory', v)} />

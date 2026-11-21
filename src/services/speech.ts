@@ -22,6 +22,8 @@ interface Opts {
  */
 export function useLiveRecognition(opts: Opts) {
   const [listening, setListening] = useState(false);
+  /** Plain-words state for the on-screen status line, so a failure can be seen instead of guessed. */
+  const [status, setStatus] = useState('idle');
   const wanted = useRef(false);
   const lastInterim = useRef('');
   const failures = useRef(0);
@@ -45,6 +47,11 @@ export function useLiveRecognition(opts: Opts) {
       interimResults: true,
       // Android's recogniser is steadier in short sessions that we restart ourselves; iOS handles long sessions well.
       continuous: Platform.OS !== 'android',
+      // Phone calls have pauses. Ask Android to wait a little longer before it cuts the session (some phones ignore this).
+      androidIntentOptions: {
+        EXTRA_SPEECH_INPUT_COMPLETE_SILENCE_LENGTH_MILLIS: 4000,
+        EXTRA_SPEECH_INPUT_POSSIBLY_COMPLETE_SILENCE_LENGTH_MILLIS: 4000,
+      },
       addsPunctuation: true,
       requiresOnDeviceRecognition: o.onDevice && local,
       contextualStrings: HINTS,
@@ -66,16 +73,23 @@ export function useLiveRecognition(opts: Opts) {
         } catch {
           /* nothing running */
         }
-        setTimeout(() => wanted.current && startNative(), 150);
+        setTimeout(() => wanted.current && startNative(), 60);
       }, delay);
     },
     [startNative],
   );
 
+  useSpeechRecognitionEvent('start', () => setStatus('listening started'));
+  useSpeechRecognitionEvent('audiostart', () => setStatus('microphone is on'));
+  useSpeechRecognitionEvent('speechstart', () => setStatus('hearing speech'));
+  useSpeechRecognitionEvent('speechend', () => setStatus('speech ended, waiting'));
+  useSpeechRecognitionEvent('nomatch', () => setStatus('heard sound but no words'));
+
   useSpeechRecognitionEvent('result', (ev) => {
     const text = ev.results?.[0]?.transcript?.trim() ?? '';
     if (!text) return;
     failures.current = 0;
+    setStatus('words received');
     if (ev.isFinal) {
       lastInterim.current = '';
       cb.current.onInterim('');
@@ -94,11 +108,12 @@ export function useLiveRecognition(opts: Opts) {
       cb.current.onInterim('');
       cb.current.onFinal(t);
     }
-    if (wanted.current) scheduleRestart(600);
+    if (wanted.current) scheduleRestart(200);
     else setListening(false);
   });
 
   useSpeechRecognitionEvent('error', (ev) => {
+    setStatus('error: ' + ev.error);
     if (ev.error === 'no-speech' || ev.error === 'aborted') return; // normal, 'end' restarts us
     if ((ev.error === 'client' || ev.error === 'busy') && wanted.current && failures.current < 5) {
       failures.current += 1; // transient: retry quietly with a longer pause instead of stopping
@@ -121,6 +136,7 @@ export function useLiveRecognition(opts: Opts) {
     wanted.current = true;
     failures.current = 0;
     setListening(true);
+    setStatus('starting…');
     return startNative();
   }, [startNative]);
 
@@ -147,5 +163,5 @@ export function useLiveRecognition(opts: Opts) {
     [],
   );
 
-  return { listening, start, stop };
+  return { listening, status, start, stop };
 }
