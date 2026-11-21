@@ -7,18 +7,26 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "scheme": "voiceguard",
-    "splash": { "image": "./assets/splash-icon.png", "resizeMode": "contain", "backgroundColor": "#0B1220" },
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0B1220"
+    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.voiceguard.app",
       "infoPlist": {
-        "NSMicrophoneUsageDescription": "VoiceGuard listens to the conversation on speaker to warn you about scam tactics. Audio is not stored.",
-        "NSSpeechRecognitionUsageDescription": "VoiceGuard turns the conversation into text to spot scam tactics."
+        "NSMicrophoneUsageDescription": "Allow $(PRODUCT_NAME) to use the microphone to hear the call on speaker.",
+        "NSSpeechRecognitionUsageDescription": "Allow $(PRODUCT_NAME) to turn speech into text on this phone."
       }
     },
     "android": {
       "package": "com.voiceguard.app",
-      "permissions": ["RECORD_AUDIO", "VIBRATE"],
+      "permissions": [
+        "RECORD_AUDIO",
+        "VIBRATE",
+        "android.permission.RECORD_AUDIO"
+      ],
       "adaptiveIcon": {
         "backgroundColor": "#0B1220",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -33,9 +41,16 @@
         {
           "microphonePermission": "Allow $(PRODUCT_NAME) to use the microphone to hear the call on speaker.",
           "speechRecognitionPermission": "Allow $(PRODUCT_NAME) to turn speech into text on this phone.",
-          "androidSpeechServicePackages": ["com.google.android.googlequicksearchbox"]
+          "androidSpeechServicePackages": [
+            "com.google.android.googlequicksearchbox"
+          ]
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "711f558c-83a0-480c-92df-ae87df60e62b"
+      }
+    }
   }
 }

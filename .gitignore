@@ -7,3 +7,5 @@ datasets/hf_*/
 *.log
 ios/
 android/
+datasets/*.parquet
+.env
