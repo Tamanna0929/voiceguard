@@ -23,6 +23,8 @@ export function useLiveRecognition(opts: Opts) {
   const [listening, setListening] = useState(false);
   const wanted = useRef(false);
   const lastInterim = useRef('');
+  const failures = useRef(0);
+  const restartTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const cb = useRef(opts);
   cb.current = opts;
 
@@ -50,9 +52,28 @@ export function useLiveRecognition(opts: Opts) {
     return true;
   }, []);
 
+  /** Android's recogniser needs a moment to fully stop; restarting too fast gives "client" errors. */
+  const scheduleRestart = useCallback(
+    (delay: number) => {
+      if (restartTimer.current) clearTimeout(restartTimer.current);
+      restartTimer.current = setTimeout(() => {
+        restartTimer.current = null;
+        if (!wanted.current) return;
+        try {
+          ExpoSpeechRecognitionModule.abort();
+        } catch {
+          /* nothing running */
+        }
+        setTimeout(() => wanted.current && startNative(), 150);
+      }, delay);
+    },
+    [startNative],
+  );
+
   useSpeechRecognitionEvent('result', (ev) => {
     const text = ev.results?.[0]?.transcript?.trim() ?? '';
     if (!text) return;
+    failures.current = 0;
     if (ev.isFinal) {
       lastInterim.current = '';
       cb.current.onInterim('');
@@ -71,12 +92,17 @@ export function useLiveRecognition(opts: Opts) {
       cb.current.onInterim('');
       cb.current.onFinal(t);
     }
-    if (wanted.current) setTimeout(() => wanted.current && startNative(), 250);
+    if (wanted.current) scheduleRestart(600);
     else setListening(false);
   });
 
   useSpeechRecognitionEvent('error', (ev) => {
     if (ev.error === 'no-speech' || ev.error === 'aborted') return; // normal, 'end' restarts us
+    if ((ev.error === 'client' || ev.error === 'busy') && wanted.current && failures.current < 5) {
+      failures.current += 1; // transient: retry quietly with a longer pause instead of stopping
+      scheduleRestart(900 + failures.current * 400);
+      return;
+    }
     if (ev.error === 'not-allowed' || ev.error === 'service-not-allowed' || ev.error === 'language-not-supported') {
       wanted.current = false;
       setListening(false);
@@ -91,12 +117,14 @@ export function useLiveRecognition(opts: Opts) {
       return false;
     }
     wanted.current = true;
+    failures.current = 0;
     setListening(true);
     return startNative();
   }, [startNative]);
 
   const stop = useCallback(() => {
     wanted.current = false;
+    if (restartTimer.current) clearTimeout(restartTimer.current);
     setListening(false);
     try {
       ExpoSpeechRecognitionModule.stop();
