@@ -8,6 +8,7 @@ const HINTS = ['OTP', 'KYC', 'Aadhaar', 'CBI', 'digital arrest', 'AnyDesk', 'UPI
 interface Opts {
   lang: 'en' | 'hi' | 'pa';
   onDevice: boolean;
+  allowCloud: boolean;
   onFinal: (text: string) => void;
   onInterim: (text: string) => void;
   onError: (message: string) => void;
@@ -25,18 +26,28 @@ export function useLiveRecognition(opts: Opts) {
   const cb = useRef(opts);
   cb.current = opts;
 
-  const startNative = useCallback(() => {
+  const startNative = useCallback((): boolean => {
     const o = cb.current;
+    const local = ExpoSpeechRecognitionModule.supportsOnDeviceRecognition();
+    // Privacy first: audio must not leave the phone before it is masked. If on-device recognition is wanted but not
+    // available, do NOT silently fall back to the cloud service; stop and say so unless the user explicitly allowed it.
+    if (o.onDevice && !local && !o.allowCloud) {
+      wanted.current = false;
+      setListening(false);
+      o.onError('ondevice-unavailable: no offline speech recognition for this phone or language');
+      return false;
+    }
     ExpoSpeechRecognitionModule.start({
       lang: LOCALE[o.lang],
       interimResults: true,
       continuous: true,
       addsPunctuation: true,
-      requiresOnDeviceRecognition: o.onDevice && ExpoSpeechRecognitionModule.supportsOnDeviceRecognition(),
+      requiresOnDeviceRecognition: o.onDevice && local,
       contextualStrings: HINTS,
       // Audio is processed in memory only: never written to a file.
       recordingOptions: { persist: false },
     });
+    return true;
   }, []);
 
   useSpeechRecognitionEvent('result', (ev) => {
@@ -81,8 +92,7 @@ export function useLiveRecognition(opts: Opts) {
     }
     wanted.current = true;
     setListening(true);
-    startNative();
-    return true;
+    return startNative();
   }, [startNative]);
 
   const stop = useCallback(() => {

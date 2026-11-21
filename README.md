@@ -100,3 +100,9 @@ Use a **paid** Gemini project (Cloud billing enabled). Google's terms say that o
 1. Train a small on-device classifier (MuRIL / IndicBERT → TFLite/Core ML) on ICFD chunk labels plus real consented data; keep the rules as a safety net.
 2. On-device Indic ASR (AI4Bharat IndicConformer) for offline Hindi/Punjabi.
 3. More languages (Tamil, Telugu, Bengali…), caller-number reputation, and a one-tap "report to 1930" form.
+
+## Privacy: what happens when someone speaks a secret
+
+- Speech-to-text runs **on the phone by default** (`onDevice: true`). If the phone cannot do it offline for the chosen language, the app stops and says so; it only uses the Google/Apple cloud service if the user switches on "Allow cloud speech" in Privacy.
+- Every transcribed sentence is masked (OTP, PIN, CVV, card, Aadhaar, phone, account, UPI, PAN, IFSC, digits spoken as words) before it reaches the screen, the history or the optional AI proxy. Audio is never written to a file.
+- If a secret number is spoken on the call (by the caller or by you), a red warning appears at once: never say it aloud, hang up, call the bank, dial 1930.

@@ -65,6 +65,10 @@ export function SettingsScreen({ settings, onChange, onBack }: { settings: Setti
           <Text style={s.switchT}>{tr(lang, 'onDevice')}</Text>
         </View>
         <View style={s.switchRow}>
+          <Switch value={settings.allowCloudSpeech} onValueChange={(v) => set('allowCloudSpeech', v)} />
+          <Text style={s.switchT}>{tr(lang, 'allowCloudSpeech')}</Text>
+        </View>
+        <View style={s.switchRow}>
           <Switch value={settings.saveHistory} onValueChange={(v) => set('saveHistory', v)} />
           <Text style={s.switchT}>{tr(lang, 'saveHistory')}</Text>
         </View>

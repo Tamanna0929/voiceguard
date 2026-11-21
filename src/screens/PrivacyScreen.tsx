@@ -59,10 +59,14 @@ export function PrivacyScreen({ settings, onChange, onBack, onWiped }: { setting
 
         <Row title={tr(lang, 'pvAudio')} value={`${tr(lang, 'pvAudioV')} ${tr(lang, 'pvAudioTemp')}`} />
         <Row title={tr(lang, 'pvText')} value={tr(lang, 'pvTextV')} />
-        <Row title={tr(lang, 'pvSpeech')} value={tr(lang, settings.onDevice ? 'pvSpeechOn' : 'pvSpeechOff')} ok={settings.onDevice} />
-        <Row title={tr(lang, 'pvProxy')} value={`${tr(lang, proxyOn ? 'pvProxyOn' : 'pvProxyOff')}${stats ? `  ${stats.proxySentences} ${tr(lang, 'pvSent')}` : ''}`} ok={!proxyOn} />
+        <Row title={tr(lang, 'pvSpeech')} value={tr(lang, settings.onDevice && (!settings.allowCloudSpeech || settings.strictOffline) ? 'pvSpeechOn' : 'pvSpeechOff')} ok={settings.onDevice && (!settings.allowCloudSpeech || settings.strictOffline)} />
+        <Row title={tr(lang, 'pvProxy')} value={`${tr(lang, proxyOn && !settings.strictOffline ? 'pvProxyOn' : 'pvProxyOff')}${stats ? `  ${stats.proxySentences} ${tr(lang, 'pvSent')}` : ''}`} ok={!proxyOn || settings.strictOffline} />
 
         <Section>{tr(lang, 'pvControls')}</Section>
+        <View style={s.sw}>
+          <Switch value={settings.strictOffline} onValueChange={(v) => set('strictOffline', v)} />
+          <Text style={[s.swT, { fontWeight: '700' }]}>{tr(lang, 'strictOffline')}</Text>
+        </View>
         <View style={s.sw}>
           <Switch value={settings.maskSensitive} onValueChange={(v) => set('maskSensitive', v)} />
           <Text style={s.swT}>{tr(lang, 'pvMaskSwitch')}</Text>
@@ -70,6 +74,10 @@ export function PrivacyScreen({ settings, onChange, onBack, onWiped }: { setting
         <View style={s.sw}>
           <Switch value={settings.onDevice} onValueChange={(v) => set('onDevice', v)} />
           <Text style={s.swT}>{tr(lang, 'onDevice')}</Text>
+        </View>
+        <View style={s.sw}>
+          <Switch value={settings.allowCloudSpeech} onValueChange={(v) => set('allowCloudSpeech', v)} />
+          <Text style={s.swT}>{tr(lang, 'allowCloudSpeech')}</Text>
         </View>
         <View style={s.sw}>
           <Switch value={settings.cloudAI} onValueChange={(v) => set('cloudAI', v)} />

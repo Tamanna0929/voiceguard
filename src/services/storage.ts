@@ -11,7 +11,11 @@ export interface Settings {
   familyName: string;
   familyNumber: string;
   /** Prefer on-device speech recognition where the phone supports it. */
+  /** Master switch: nothing leaves the phone. Forces on-device speech and turns the cloud AI off. */
+  strictOffline: boolean;
   onDevice: boolean;
+  /** Only used when on-device recognition is unavailable: allow the phone's cloud speech service (less private). */
+  allowCloudSpeech: boolean;
   saveHistory: boolean;
   /** Hide OTPs, PINs, card/Aadhaar/phone/account numbers before they are shown, stored or sent anywhere. */
   maskSensitive: boolean;
@@ -25,7 +29,9 @@ export const DEFAULT_SETTINGS: Settings = {
   aiEndpoint: '',
   familyName: '',
   familyNumber: '',
-  onDevice: false,
+  strictOffline: true,
+  onDevice: true,
+  allowCloudSpeech: false,
   saveHistory: true,
   maskSensitive: true,
   historyDays: 30,

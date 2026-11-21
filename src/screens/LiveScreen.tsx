@@ -38,6 +38,8 @@ export function LiveScreen({ settings, script, onBack, onRecovery }: { settings:
   const [interim, setInterim] = useState('');
   const [overlay, setOverlay] = useState(false);
   const [error, setError] = useState('');
+  const [leak, setLeak] = useState(false);
+  const leakTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [finished, setFinished] = useState(false);
   const [speakAloud, setSpeakAloud] = useState(false);
   const [runKey, setRunKey] = useState(0);
@@ -67,12 +69,19 @@ export function LiveScreen({ settings, script, onBack, onRecovery }: { settings:
       if (m.found.length) {
         m.found.forEach((f) => (maskedCounts.current[f] = (maskedCounts.current[f] ?? 0) + 1));
         setHidden((h) => h + m.found.length);
+        // A secret (OTP, PIN, card, Aadhaar, account) was SPOKEN on this call, by the caller or by you. Warn at once.
+        if (!speaker && m.found.some((f) => f === 'otp' || f === 'pin' || f === 'card' || f === 'aadhaar' || f === 'account')) {
+          setLeak(true);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error).catch(() => {});
+          if (leakTimer.current) clearTimeout(leakTimer.current);
+          leakTimer.current = setTimeout(() => setLeak(false), 15000);
+        }
       }
       const s = engine.push(text, Date.now());
       const utt = s.utterance!;
       if (speaker) who.current.set(utt.id, speaker);
       refresh(s);
-      if (settings.cloudAI && settings.aiEndpoint) {
+      if (settings.cloudAI && settings.aiEndpoint && !settings.strictOffline) {
         const ctx = engine
           .getUtterances()
           .slice(-7, -1)
@@ -83,7 +92,7 @@ export function LiveScreen({ settings, script, onBack, onRecovery }: { settings:
         });
       }
     },
-    [engine, refresh, settings.cloudAI, settings.aiEndpoint, settings.maskSensitive, lang],
+    [engine, refresh, settings.cloudAI, settings.aiEndpoint, settings.strictOffline, settings.maskSensitive, lang],
   );
   const processRef = useRef(process);
   processRef.current = process;
@@ -92,9 +101,11 @@ export function LiveScreen({ settings, script, onBack, onRecovery }: { settings:
   const mic = useLiveRecognition({
     lang,
     onDevice: settings.onDevice,
+    allowCloud: settings.allowCloudSpeech && !settings.strictOffline,
     onFinal: (t) => processRef.current(t),
     onInterim: (t: string) => setInterim(settings.maskSensitive ? maskSensitive(t).text : t),
-    onError: (m) => setError(m.startsWith('not-allowed') ? tr(lang, 'micDenied') : `${tr(lang, 'speechError')}: ${m}`),
+    onError: (m) =>
+      setError(m.startsWith('not-allowed') ? tr(lang, 'micDenied') : m.startsWith('ondevice-unavailable') ? tr(lang, 'onDeviceMissing') : `${tr(lang, 'speechError')}: ${m}`),
   });
 
   // ---- scripted demo / awareness mode ----
@@ -207,6 +218,7 @@ export function LiveScreen({ settings, script, onBack, onRecovery }: { settings:
         <Transcript lines={lines} interim={interim} lang={lang} empty={tr(lang, 'tapStart')} youLabel={tr(lang, 'you')} callerLabel={tr(lang, 'caller')} />
       </View>
 
+      {leak ? <Text style={s.leak}>⚠️ {tr(lang, 'spokenLeak')}</Text> : null}
       {error ? <Text style={s.error}>{error}</Text> : null}
       {familyNote ? <Text style={s.note}>{familyNote}</Text> : null}
 
@@ -274,6 +286,7 @@ const s = StyleSheet.create({
   section: { color: C.dim, fontSize: 12, fontWeight: '800', letterSpacing: 1, textTransform: 'uppercase', marginTop: 14, marginBottom: 6 },
   listBox: { flex: 1 },
   error: { color: C.red, marginTop: 6, fontSize: 13 },
+  leak: { color: '#fff', backgroundColor: C.red, marginTop: 8, padding: 10, borderRadius: 10, fontSize: 14, fontWeight: '700', overflow: 'hidden' },
   note: { color: C.green, marginTop: 6, fontSize: 13 },
   lesson: { borderWidth: 1, borderRadius: 12, padding: 12, marginTop: 8, backgroundColor: C.card },
   lessonH: { color: C.text, fontWeight: '800', marginBottom: 4 },
