@@ -1,0 +1,41 @@
+{
+  "expo": {
+    "name": "VoiceGuard",
+    "slug": "voiceguard",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "scheme": "voiceguard",
+    "splash": { "image": "./assets/splash-icon.png", "resizeMode": "contain", "backgroundColor": "#0B1220" },
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.voiceguard.app",
+      "infoPlist": {
+        "NSMicrophoneUsageDescription": "VoiceGuard listens to the conversation on speaker to warn you about scam tactics. Audio is not stored.",
+        "NSSpeechRecognitionUsageDescription": "VoiceGuard turns the conversation into text to spot scam tactics."
+      }
+    },
+    "android": {
+      "package": "com.voiceguard.app",
+      "permissions": ["RECORD_AUDIO", "VIBRATE"],
+      "adaptiveIcon": {
+        "backgroundColor": "#0B1220",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "plugins": [
+      [
+        "expo-speech-recognition",
+        {
+          "microphonePermission": "Allow $(PRODUCT_NAME) to use the microphone to hear the call on speaker.",
+          "speechRecognitionPermission": "Allow $(PRODUCT_NAME) to turn speech into text on this phone.",
+          "androidSpeechServicePackages": ["com.google.android.googlequicksearchbox"]
+        }
+      ]
+    ]
+  }
+}

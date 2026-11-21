@@ -1,0 +1,41 @@
+{
+  "name": "voiceguard",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "^3.1.1",
+    "expo": "~58.0.26",
+    "expo-dev-client": "~58.0.21",
+    "expo-haptics": "~58.0.8",
+    "expo-keep-awake": "~58.0.4",
+    "expo-linking": "~58.0.17",
+    "expo-sms": "~58.0.3",
+    "expo-speech": "~58.0.4",
+    "expo-speech-recognition": "~58.0.1",
+    "expo-status-bar": "~58.0.5",
+    "react": "19.3.0",
+    "react-native": "0.88.1",
+    "react-native-svg": "^15.16.1"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.6",
+    "@types/react": "~19.3.0",
+    "tsx": "^4.23.15",
+    "typescript": "~6.0.3"
+  },
+  "scripts": {
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "web": "expo start --web",
+    "typecheck": "tsc --noEmit",
+    "eval": "tsx scripts/evaluate.ts",
+    "fetch-datasets": "python scripts/fetch_datasets.py",
+    "proxy": "node server/proxy.js",
+    "train": "python training/train.py --hf",
+    "check-model": "tsx scripts/check-model-parity.ts",
+    "test": "tsx scripts/test-privacy.ts"
+  },
+  "private": true,
+  "description": "VoiceGuard: real-time scam-call guard for India (iOS + Android, Expo)"
+}

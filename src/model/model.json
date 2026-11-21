@@ -1,0 +1,1 @@
+{"meta":{"stub":true,"reliable":false,"note":"Placeholder. Run: python training/train.py --hf   (see training/README.md)"},"ngram":[2,5],"bias":0,"features":{}}

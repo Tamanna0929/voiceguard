@@ -1,0 +1,9 @@
+node_modules/
+.expo/
+dist/
+web-build/
+datasets/icfd/
+datasets/hf_*/
+*.log
+ios/
+android/
