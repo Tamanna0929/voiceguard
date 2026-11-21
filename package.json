@@ -34,7 +34,10 @@
     "proxy": "node server/proxy.js",
     "train": "python training/train.py --hf",
     "check-model": "tsx scripts/check-model-parity.ts",
-    "test": "tsx scripts/test-privacy.ts"
+    "test": "tsx scripts/test-privacy.ts",
+    "get:data": "tsx scripts/fetch-data.ts",
+    "eval:data": "tsx scripts/eval-datasets.ts",
+    "import:csv": "tsx scripts/import-csv.ts"
   },
   "private": true,
   "description": "VoiceGuard: real-time scam-call guard for India (iOS + Android, Expo)"

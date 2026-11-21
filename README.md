@@ -72,12 +72,17 @@ Current results (small samples, so indicative only):
 | ICFD-31k sample, 20 calls | **6/8 fraud caught, 0/12 false alarms**, median 49 s to alert. Misses: a mislabelled bank-warning call and a slow romance "wrong number" con |
 | UCI SMS ham, 4,827 messages | 0.0% red alerts, 0.3% amber |
 
-## Optional AI proxy
+## Optional AI proxy (Gemini or Claude)
 
 ```bash
-ANTHROPIC_API_KEY=... npm run proxy     # listens on :8787, model via VG_MODEL (default claude-haiku-5-5)
+GEMINI_API_KEY=...    npm run proxy     # Gemini, model via VG_MODEL (default gemini-3.6-flash)
+ANTHROPIC_API_KEY=... npm run proxy     # Claude instead, if no Gemini key is set
 ```
-Deploy it anywhere with HTTPS, then paste the URL in **Settings → Cloud AI**.
+Listens on :8787. Deploy it anywhere with HTTPS, then paste the URL in **Settings -> Cloud AI**. It is off by default.
+
+Privacy design: the app masks digits and IDs on the phone first, so only masked sentences reach the proxy. The proxy redacts again, caps request size, rate-limits, never logs request text, and sends `store:false` to Gemini. The API key lives only on the server.
+
+Use a **paid** Gemini project (Cloud billing enabled). Google's terms say that on the free tier it may use submitted content to improve its products, and that human reviewers may read it. On paid services it says it does not.
 
 ## Limits you should state honestly
 

@@ -7,5 +7,6 @@ datasets/hf_*/
 *.log
 ios/
 android/
-datasets/*.parquet
-.env
+datasets/*.jsonl
+
+!datasets/voiceguard-handwritten-calls.jsonl
