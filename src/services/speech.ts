@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { Platform } from 'react-native';
 import { ExpoSpeechRecognitionModule, useSpeechRecognitionEvent } from 'expo-speech-recognition';
 
 export const LOCALE: Record<'en' | 'hi' | 'pa', string> = { en: 'en-IN', hi: 'hi-IN', pa: 'pa-IN' };
@@ -42,7 +43,8 @@ export function useLiveRecognition(opts: Opts) {
     ExpoSpeechRecognitionModule.start({
       lang: LOCALE[o.lang],
       interimResults: true,
-      continuous: true,
+      // Android's recogniser is steadier in short sessions that we restart ourselves; iOS handles long sessions well.
+      continuous: Platform.OS !== 'android',
       addsPunctuation: true,
       requiresOnDeviceRecognition: o.onDevice && local,
       contextualStrings: HINTS,

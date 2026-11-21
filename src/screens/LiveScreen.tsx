@@ -103,7 +103,10 @@ export function LiveScreen({ settings, script, onBack, onRecovery }: { settings:
     // strict mode always means on-device, whatever an older saved setting says
     onDevice: settings.onDevice || settings.strictOffline,
     allowCloud: settings.allowCloudSpeech && !settings.strictOffline,
-    onFinal: (t) => processRef.current(t),
+    onFinal: (t) => {
+      setError(''); // words are arriving again, so any earlier hiccup is over
+      processRef.current(t);
+    },
     onInterim: (t: string) => setInterim(settings.maskSensitive ? maskSensitive(t).text : t),
     onError: (m) =>
       setError(m.startsWith('not-allowed') ? tr(lang, 'micDenied') : m.startsWith('ondevice-unavailable') ? tr(lang, 'onDeviceMissing') : `${tr(lang, 'speechError')}: ${m}`),
