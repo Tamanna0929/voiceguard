@@ -35,9 +35,9 @@ const requests = (obj: string, extraVerbs = '') => {
 const V_ENTER = '(?:enter|type|key in|put in|punch in|log ?in|sign in)(?![a-z])';
 
 const OBJ_OTP =
-  'otp|o\\.?\\s?t\\.?\\s?p|one[- ]time[- ]password|verification code|security code|(?:6|six)[- ]digit code|sms code|ओ\\s?टी\\s?पी|वन टाइम पासवर्ड|वेरिफिकेशन कोड|ਓ\\s?ਟੀ\\s?ਪੀ|ਵੈਰੀਫਿਕੇਸ਼ਨ ਕੋਡ';
+  'otp|o\\.?\\s?t\\.?\\s?p|one[- ]time[- ]password|verification code|security code|(?:6|six)[- ]digit code|sms code|ओ\\s?टी\\s?पी|वन टाइम पासवर्ड|वेरिफिकेशन कोड|ਓ\\s?ਟੀ\\s?ਪੀ|ਵੈਰੀਫਿਕੇਸ਼ਨ ਕੋਡ|(?:छह|छः|6)\\s?अंक\\S*\\s?(?:का|की)?\\s?कोड|chh?e\\s+ank\\s+(?:ka|ki)\\s+(?:code|number)|ਛੇ\\s?ਅੰਕਾਂ\\s?ਦਾ\\s?ਕੋਡ';
 const OBJ_CRED =
-  'cvv|cvc|(?:upi|atm|debit|credit|net\\s?banking|mpin|m-pin)\\s?pin|\\bpin\\b|card number|card details|card no\\.?|expiry date|password|passcode|net\\s?banking|login details|account number|सीवीवी|पिन|कार्ड नंबर|कार्ड की डिटेल|पासवर्ड|ਸੀਵੀਵੀ|ਪਿੰਨ|ਕਾਰਡ ਨੰਬਰ|ਪਾਸਵਰਡ';
+  'cvv|cvc|(?:upi|atm|debit|credit|net\\s?banking|mpin|m-pin)\\s?pin|\\bpin\\b|card number|card details|card no\\.?|expiry date|password|passcode|net\\s?banking|login details|account number|सीवीवी|पिन|कार्ड नंबर|कार्ड की डिटेल|पासवर्ड|ਸੀਵੀਵੀ|ਪਿੰਨ|ਕਾਰਡ ਨੰਬਰ|ਪਾਸਵਰਡ|bank(?:ing)?\\s+(?:account\\s+)?(?:details|information|info)|account\\s+(?:details|information)|(?:credit\\s+|debit\\s+)?card\\s+(?:information|info)|(?:3|three|teen|तीन|ਤਿੰਨ)[- ]?(?:digit|ank|अंक\\S*|ਅੰਕ\\S*)\\s+(?:wala\\s+|ka\\s+|का\\s+|वाला\\s+|ਵਾਲਾ\\s+|ਦਾ\\s+)?(?:number|नंबर|ਨੰਬਰ)|card\\s+ke\\s+(?:peeche|back)|कार्ड\\s?के\\s?पीछे|ਕਾਰਡ\\s?ਦੇ\\s?ਪਿੱਛੇ';
 const OBJ_ID =
   '(?:aadhaar|aadhar|adhar|pan)\\s?(?:card)?\\s?(?:number|no\\.?|details|copy|photo|card)|passport|selfie|आधार\\s?(?:नंबर|कार्ड|की फोटो)|पैन\\s?(?:नंबर|कार्ड)|ਆਧਾਰ\\s?ਨੰਬਰ|ਪੈਨ\\s?ਨੰਬਰ';
 
@@ -90,6 +90,8 @@ export const TACTICS: TacticDef[] = [
       p('ऐप\\s?(?:डाउनलोड|इंस्टॉल)|ਐਪ\\s?ਡਾਊਨਲੋਡ'),
       p(latin('(?:click|tap|open)\\s+(?:on\\s+)?(?:the |this )?link|link (?:par|pe) click|link (?:par|pe) tap'), 0.6),
       p('लिंक\\s?(?:पर|पे)\\s?क्लिक', 0.6),
+      p(latin('(?:we|i)\\s+(?:need|require|want|must have)\\s+(?:you to (?:provide|give|share|verify)\\s+)?(?:your\\s+)?(?:full\\s+)?(?:credit\\s+card|debit\\s+card|bank\\s+account|banking|account|login|payment|card)\\s+(?:information|details|info|credentials|number)|(?:provide|verify|confirm|give|send|share)\\s+(?:us\\s+)?(?:with\\s+)?your\\s+(?:full\\s+)?(?:login|log-in|account|banking|bank account|credit card|debit card)\\s+(?:credentials|details|information|info|number)')),
+      p(latin('(?:social security|ssn|date of birth|identity number|national id)\\b[^.!?।\\n]{0,40}?(?:verify|provide|give|confirm|share|need|require)|(?:verify|provide|give|confirm|share|need|require)[^.!?।\\n]{0,40}?(?:social security|ssn|date of birth|identity number|national id)')),
     ],
   },
   {
@@ -114,6 +116,9 @@ export const TACTICS: TacticDef[] = [
       p('किसी\\s?(?:को|से)\\s?(?:भी\\s?)?(?:मत|न|ना|नहीं)\\s?(?:बता|बोल|बात)\\S*|घर\\s?(?:वालों|वाले)\\s?(?:को)?\\s?(?:मत|न|नहीं)\\s?बता\\S*|गोपनीय|गुप्त\\s?रख\\S*|राज़\\s?रख\\S*|सीक्रेट'),
       p(latin('kisse?\\s+nu\\s+(?:na|nahi|nahin)\\s+dass\\w*|kise\\s+nu\\s+(?:na|nahi)\\s+das\\w*|kisi\\s+nu\\s+(?:na|nahi)\\s+das\\w*')),
       p('ਕਿਸੇ\\s?ਨੂੰ\\s?(?:ਵੀ\\s?)?(?:ਨਾ|ਨਹੀਂ)\\s?ਦੱਸ\\S*|ਗੁਪਤ|ਘਰ\\s?ਵਾਲਿਆਂ\\s?ਨੂੰ\\s?(?:ਨਾ|ਨਹੀਂ)\\s?ਦੱਸ\\S*'),
+      p(latin('(?:papa|mummy|mama|ghar\\s+walon?)\\s+ko\\s+(?:mat|na)\\s+bata\\w*')),
+      p('(?:पापा|मम्मी|माँ|दादा\\s?जी|दादाजी)\\s?को\\s?(?:मत|न|ना)\\s?बता\\S*'),
+      p('(?:ਪਾਪਾ|ਮੰਮੀ|ਮਾਂ)\\s?ਨੂੰ\\s?(?:ਨਾ|ਨਹੀਂ)\\s?ਦੱਸ\\S*'),
     ],
   },
   {
@@ -124,9 +129,11 @@ export const TACTICS: TacticDef[] = [
       p(latin("(?:pay|paying|payment)\\b[^.!?।\\n]{0,35}?(?:fee|fees|charge|charges|amount|fine|penalty|bill|dues|deposit|(?:₹|rs\\.?|inr)\\s?\\d+|\\d{3,})")),
       p(latin('(?:cancellation|reconnection|re-?activation|processing|handling|service|release|clearance|late|priority|insurance|delivery|redelivery) (?:fee|fees|charge|charges)|(?:secure|payment|short) link|pay (?:through|via|by|using) (?:upi|link|net\\s?banking|card)|(?:lend|loan|borrow) (?:me )?(?:some |a (?:small )?)?(?:money|amount)|need (?:a |some )?(?:small )?(?:amount of )?(?:money|cash|help with money)|tide me over')),
       p('सेफ\\s?अकाउंट|आरबीआई\\s?अकाउंट|प्रोसेसिंग\\s?फीस|रजिस्ट्रेशन\\s?फीस|सिक्योरिटी\\s?डिपॉजिट|गिफ्ट\\s?कार्ड|क्यूआर\\s?कोड|जुर्माना\\s?भर'),
-      p(latin('(?:transfer|send|deposit|pay|remit|bhej\\w*|jama\\s?kar\\w*|transfer\\s?kar\\w*|bhejo|bhejna|payment\\s?kar\\w*|pay\\s?kar\\w*)' + '[^.!?।\\n]{0,40}?' + '(?:money|amount|rs\\.?|inr|rupees?|lakh|crore|paise|paisa|upi|gpay|google\\s?pay|phone\\s?pe|phonepe|paytm|account|funds|\\d{3,})')),
+      p(latin('(?:transfer|send|deposit|pay|remit|bhej\\w*|jama\\s?(?:kar|kij|karw)\\w*|transfer\\s?kar\\w*|bhejo|bhejna|payment\\s?kar\\w*|pay\\s?kar\\w*)' + '[^.!?।\\n]{0,40}?' + '(?:money|amount|rs\\.?|inr|rupees?|rupaye|rupay|hazar|hajar|hazaar|lakh|crore|paise|paisa|upi|gpay|google\\s?pay|phone\\s?pe|phonepe|paytm|account|funds|\\d{3,})')),
       p('(?:ट्रांसफर|भेज\\S*|जमा|पेमेंट)[^.!?।\\n]{0,40}?(?:पैसे|रुपये|रुपए|राशि|रकम|अकाउंट|खाते|यूपीआई|\\d{3,})|(?:पैसे|रुपये|रुपए|राशि|रकम)[^.!?।\\n]{0,30}?(?:ट्रांसफर|भेज\\S*|जमा)'),
       p('(?:ਭੇਜ\\S*|ਜਮ੍ਹਾ|ਟ੍ਰਾਂਸਫਰ)[^.!?।\\n]{0,40}?(?:ਪੈਸੇ|ਰੁਪਏ|ਰਕਮ|ਖਾਤੇ|ਖਾਤਾ|\\d{3,})|(?:ਪੈਸੇ|ਰੁਪਏ|ਰਕਮ)[^.!?।\\n]{0,30}?(?:ਭੇਜ\\S*|ਜਮ੍ਹਾ|ਟ੍ਰਾਂਸਫਰ)'),
+      p(latin('(?:rupaye|rupay|rupees?|hazar|hajar|hazaar|lakh)[^.!?।\\n]{0,30}?(?:bhej\\w*|jama\\s?(?:kar|kij|karw)\\w*|transfer\\w*|pay\\s?kar\\w*|de\\s?(?:do|dijiye|dena)|dijiye)')),
+      p(latin('transfer (?:the )?payment|(?:make|send) (?:an? )?(?:immediate |one-time |small )?(?:deposit|payment)|(?:one-time|immediate|direct|upfront|advance) payment|donat\\w+[^.!?।\\n]{0,30}?(?:account|funds)|(?:to|into) (?:this|the) bank account|pay(?:ment)? over the phone')),
     ],
   },
   {
@@ -138,6 +145,7 @@ export const TACTICS: TacticDef[] = [
       p(latin('giraft\\w+|gireft\\w+|girft\\w+|warrant|jail\\s+(?:jana|ho)\\w*|(?:band|block|suspend|disconnect)\\s+ho\\s+(?:jayega|jayegi|jaega|jaegi|jayenge)|(?:kat|katt|kaat)\\s+(?:jayega|jayegi|jaega|jaegi|diya jayega)|case\\s+darj|fir\\s+darj|kanooni\\s+karrawai|legal\\s+action|bijli\\s+(?:kat|band)\\w*')),
       p('गिरफ़्?तार|गिरफ्तारी|वारंट|केस\\s?दर्ज|जेल|अदालत|मनी\\s?लॉन्ड्रिंग|नारकोटिक्स|(?:बंद|ब्लॉक|सस्पेंड)\\s?हो\\s?जाएगा|(?:बंद|ब्लॉक|सस्पेंड)\\s?कर\\s?दिया\\s?जाएगा|कनेक्शन\\s?कट|बिजली\\s?(?:कट|काट)|कानूनी\\s?कार्रवाई'),
       p('ਗ੍ਰਿਫ਼?ਤਾਰ|ਵਾਰੰਟ|ਜੇਲ੍ਹ|ਕੇਸ\\s?ਦਰਜ|ਮਨੀ\\s?ਲਾਂਡਰਿੰਗ|(?:ਬੰਦ|ਬਲੌਕ)\\s?ਹੋ\\s?ਜਾਵੇਗਾ|ਕੱਟ\\s?ਦਿੱਤਾ\\s?ਜਾਵੇਗਾ|ਕੁਨੈਕਸ਼ਨ\\s?ਕੱਟ|ਕਾਨੂੰਨੀ\\s?ਕਾਰਵਾਈ'),
+      p(latin('(?:band|block|suspend)\\s+kar\\s+(?:diya|di)\\s+jayeg\\w*')),
     ],
   },
   {
@@ -150,6 +158,9 @@ export const TACTICS: TacticDef[] = [
       p(latin('badge number|employee id|case number|fir number|file number|complaint number|reference number is')),
       p('(?:सीबीआई|पुलिस|कस्टम|साइबर\\s?क्राइम|नारकोटिक्स|आरबीआई|ट्राई|बिजली\\s?विभाग|इनकम\\s?टैक्स|क्राइम\\s?ब्रांच)[^.!?।\\n]{0,20}?(?:अधिकारी|विभाग|से बोल|से बात|ऑफिस|इंस्पेक्टर|टीम)|इंस्पेक्टर|मैं[^.!?।\\n]{0,25}?से\\s?बोल'),
       p('ਮੈਂ[^.!?।\\n]{0,25}?(?:ਤੋਂ|ਵਿਭਾਗ)[^.!?।\\n]{0,10}?ਬੋਲ|(?:ਪੁਲਿਸ|ਸੀਬੀਆਈ|ਕਸਟਮ|ਸਾਈਬਰ\\s?ਕ੍ਰਾਈਮ|ਬਿਜਲੀ\\s?ਵਿਭਾਗ|ਇਨਕਮ\\s?ਟੈਕਸ)[^.!?।\\n]{0,20}?(?:ਅਧਿਕਾਰੀ|ਵਿਭਾਗ|ਤੋਂ|ਦਫ਼ਤਰ|ਇੰਸਪੈਕਟਰ)|ਇੰਸਪੈਕਟਰ'),
+      p(latin('(?:ye|yeh|this is)\\s+(?:a\\s+)?(?:call\\s+)?(?:from\\s+)?(?:trai|cbi|rbi|police|customs|fedex|dhl|bank|sbi|hdfc|icici|amazon|microsoft|telecom)\\w*(?:\\s+(?:se|ki|ka)\\s+call)?')),
+      p('(?:सीबीआई|पुलिस|कस्टम|साइबर\\s?क्राइम|आरबीआई|ट्राई|फेडेक्स|एसबीआई|माइक्रोसॉफ्ट|बैंक)\\s?(?:से|की|का)\\s?(?:कॉल|फोन)'),
+      p('(?:ਸੀਬੀਆਈ|ਪੁਲਿਸ|ਕਸਟਮ|ਸਾਈਬਰ\\s?ਕ੍ਰਾਈਮ|ਆਰਬੀਆਈ|ਟਰਾਈ|ਫੈਡੈਕਸ|ਐਸਬੀਆਈ|ਮਾਈਕ੍ਰੋਸਾਫਟ|ਬੈਂਕ)\\s?ਤੋਂ\\s?(?:ਕਾਲ|ਫ਼ੋਨ)'),
     ],
   },
   {
@@ -170,6 +181,9 @@ export const TACTICS: TacticDef[] = [
       p(latin('kyc\\s+(?:update|expire|pending)\\s*(?:karo|kijiye|nahi)?|khata\\s+(?:band|block)|account\\s+(?:band|block)|parcel\\s+(?:pakda|ruka|seized)|bill\\s+(?:baki|pending|bakaya)|bakaya')),
       p('केवाईसी|खाता\\s?(?:बंद|ब्लॉक)|आधार\\s?(?:लिंक|अपडेट)|पैन\\s?(?:लिंक|अपडेट)|सिम\\s?(?:बंद|ब्लॉक)|बिल\\s?(?:बकाया|पेंडिंग)|बकाया|पार्सल[^.!?।\\n]{0,40}?(?:पकड़|जब्त|कस्टम|अवैध|ड्रग)|संदिग्ध\\s?(?:लेनदेन|गतिविधि)'),
       p('ਕੇਵਾਈਸੀ|ਖਾਤਾ\\s?(?:ਬੰਦ|ਬਲੌਕ)|ਆਧਾਰ\\s?(?:ਲਿੰਕ|ਅਪਡੇਟ)|ਬਿੱਲ\\s?(?:ਬਕਾਇਆ|ਪੈਂਡਿੰਗ)|ਬਕਾਇਆ|ਪਾਰਸਲ[^.!?।\\n]{0,40}?(?:ਫੜ|ਜ਼ਬਤ|ਕਸਟਮ|ਗੈਰਕਾਨੂੰਨੀ)'),
+      p(latin('galat\\s+gatividhi\\w*|sandigdh\\s+gatividhi\\w*|press\\s+(?:1|9|one|nine)\\b|(?:nau|ek)\\s+dab\\w*')),
+      p('गलत\\s?गतिविधि|संदिग्ध\\s?गतिविधि|(?:नौ|एक|९|१)\\s?दबा\\S*'),
+      p('ਗਲਤ\\s?ਗਤੀਵਿਧੀ\\S*|(?:ਨੌਂ|ਇੱਕ)\\s?ਦਬਾ\\S*'),
     ],
   },
   {
@@ -181,6 +195,9 @@ export const TACTICS: TacticDef[] = [
       p(latin('lottery\\s+lag\\w*|inaam|jeet\\s+gaye|jeeta\\s+hai|aapne\\s+jeet\\w*|badhai|refund\\s+(?:aaya|mil)\\w*|loan\\s+(?:pass|approve|mil)\\w*|ghar\\s+baithe\\s+kamai|paise\\s+double|nivesh')),
       p('इनाम|लॉटरी|जीत\\s?(?:गए|ली|लिया|ा है)|बधाई|रिफंड|लकी\\s?ड्रा|केबीसी|घर\\s?बैठे\\s?कमाई|पार्ट\\s?टाइम\\s?जॉब|लोन\\s?(?:पास|मंज़ूर|मंजूर)|निवेश\\s?(?:योजना|मौका)|पैसे\\s?दुगुने'),
       p('ਇਨਾਮ|ਲਾਟਰੀ|ਜਿੱਤ\\S*|ਵਧਾਈ|ਰਿਫੰਡ|ਲੱਕੀ\\s?ਡਰਾਅ|ਘਰ\\s?ਬੈਠੇ\\s?ਕਮਾਈ|ਲੋਨ\\s?(?:ਪਾਸ|ਮਨਜ਼ੂਰ)|ਨਿਵੇਸ਼'),
+      p(latin('part\\s?time\\s+(?:job|kaam|work)|ghar\\s+baithe|(?:har|every|each)\\s+task|telegram\\s+(?:group|channel)|bina\\s+(?:kisi\\s+)?(?:document|dastavez|guarantee|cibil)\\w*|loan[^.!?।\\n]{0,30}?(?:manjoor|manzoor|approve|pass|sanction)\\w*')),
+      p('घर\\s?बैठे|पार्ट\\s?टाइम\\s?(?:काम|जॉब)|(?:हर|प्रत्येक)\\s?टास्क|टेलीग्राम\\s?ग्रुप|बिना\\s?(?:किसी\\s?)?(?:दस्तावे\\S*|गारंटी|सिबिल)|लोन[^.!?।\\n]{0,30}?(?:मंज़ूर|मंजूर|पास|अप्रूव)'),
+      p('ਘਰ\\s?ਬੈਠੇ|ਪਾਰਟ\\s?ਟਾਈਮ|ਹਰ\\s?ਟਾਸਕ|ਟੈਲੀਗ੍ਰਾਮ\\s?ਗਰੁੱਪ|ਬਿਨਾਂ\\s?(?:ਕਿਸੇ\\s?)?ਦਸਤਾਵੇ\\S*|ਲੋਨ[^.!?।\\n]{0,30}?(?:ਮਨ\\S*ੂਰ|ਪਾਸ)'),
     ],
   },
   {
@@ -190,6 +207,9 @@ export const TACTICS: TacticDef[] = [
       p(latin("(?:son|daughter|nephew|grandson|granddaughter|husband|wife|brother|sister|beta|beti|bhai|papa|mummy|mama|nana|dadu|pota|poti|bhanja|bhatija)[^.!?।\\n]{0,45}?(?:accident|arrest\\w*|hospital|jail|police|bail|kidnap\\w*|custody|emergency|critical|operation|surgery)|(?:new|naya|changed my|number badal)\\s+(?:phone\\s+)?number|guess who|can you guess|pehchan\\w*|save this number|bail (?:money|amount)|medical (?:emergency|expenses|bills?)")),
       p('(?:बेटा|बेटी|बेटे|बहू|पति|भाई|पापा|मम्मी|पोता|पोती|भांजा|भतीजा)[^.!?।\\n]{0,45}?(?:एक्सीडेंट|गिरफ्तार|अस्पताल|जेल|पुलिस|ज़मानत|जमानत|किडनैप|हिरासत|इमरजेंसी|ऑपरेशन)|नया\\s?नंबर|नंबर\\s?बदल|पहचाना|ज़मानत\\s?के\\s?पैसे'),
       p('(?:ਪੁੱਤ|ਪੁੱਤਰ|ਧੀ|ਭਰਾ|ਪਤੀ|ਪੋਤਾ|ਭਤੀਜਾ|ਭਾਣਜਾ)[^.!?।\\n]{0,45}?(?:ਹਾਦਸਾ|ਗ੍ਰਿਫ਼?ਤਾਰ|ਹਸਪਤਾਲ|ਜੇਲ੍ਹ|ਪੁਲਿਸ|ਜ਼ਮਾਨਤ|ਇਮਰਜੈਂਸੀ|ਅਪਰੇਸ਼ਨ)|ਨਵਾਂ\\s?ਨੰਬਰ|ਪਛਾਣਿਆ'),
+      p(latin("(?:mera|meri)\\s+(?:accident|arrest)|i\\s+(?:had|was in|met with)\\s+an?\\s+accident|(?:police|thane|thana)\\s+(?:station\\s+)?(?:me|mein|in)\\s+(?:hoon|hun|am)|main\\s+(?:jail|hospital|thane|police station)\\s+(?:me|mein)|i(?:'m| am)\\s+(?:in|at)\\s+(?:the\\s+)?(?:police station|hospital|jail)")),
+      p('(?:मेरा|मेरी|मुझे)[^.!?।\\n]{0,25}?(?:एक्सीडेंट|गिरफ्तार|जेल|हिरासत)|(?:थाने|पुलिस\\s?स्टेशन|हॉस्पिटल|अस्पताल)\\s?में\\s?(?:हूँ|हूं)'),
+      p('ਮੇਰਾ\\s?ਐਕਸੀਡੈਂਟ|(?:ਥਾਣੇ|ਹਸਪਤਾਲ)\\s?ਵਿੱਚ\\s?ਹਾਂ'),
     ],
   },
 ];
