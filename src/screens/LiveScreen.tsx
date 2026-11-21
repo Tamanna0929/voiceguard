@@ -100,7 +100,8 @@ export function LiveScreen({ settings, script, onBack, onRecovery }: { settings:
   // ---- live microphone mode ----
   const mic = useLiveRecognition({
     lang,
-    onDevice: settings.onDevice,
+    // strict mode always means on-device, whatever an older saved setting says
+    onDevice: settings.onDevice || settings.strictOffline,
     allowCloud: settings.allowCloudSpeech && !settings.strictOffline,
     onFinal: (t) => processRef.current(t),
     onInterim: (t: string) => setInterim(settings.maskSensitive ? maskSensitive(t).text : t),

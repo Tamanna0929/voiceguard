@@ -61,7 +61,7 @@ export function SettingsScreen({ settings, onChange, onBack }: { settings: Setti
         )}
 
         <View style={s.switchRow}>
-          <Switch value={settings.onDevice} onValueChange={(v) => set('onDevice', v)} />
+          <Switch value={settings.onDevice || settings.strictOffline} disabled={settings.strictOffline} onValueChange={(v) => set('onDevice', v)} />
           <Text style={s.switchT}>{tr(lang, 'onDevice')}</Text>
         </View>
         <View style={s.switchRow}>
