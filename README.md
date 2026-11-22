@@ -106,3 +106,5 @@ Use a **paid** Gemini project (Cloud billing enabled). Google's terms say that o
 - Speech-to-text runs **on the phone by default** (`onDevice: true`). If the phone cannot do it offline for the chosen language, the app stops and says so; it only uses the Google/Apple cloud service if the user switches on "Allow cloud speech" in Privacy.
 - Every transcribed sentence is masked (OTP, PIN, CVV, card, Aadhaar, phone, account, UPI, PAN, IFSC, digits spoken as words) before it reaches the screen, the history or the optional AI proxy. Audio is never written to a file.
 - If a secret number is spoken on the call (by the caller or by you), a red warning appears at once: never say it aloud, hang up, call the bank, dial 1930.
+ 
+**Download the Android app (APK):** https://expo.dev/accounts/tamanna_29/projects/voiceguard/builds/2e03b2b5-182f-444e-a6be-52b48f1ab075 
